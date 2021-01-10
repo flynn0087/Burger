@@ -1,4 +1,5 @@
 // Import MySQL connection.
+const { query } = require("../config/connection.js");
 const connection = require("../config/connection.js");
 
 // The below helper function loops through and creates an array of question marks - ["?", "?", "?"] - and turns it into a string.
@@ -46,5 +47,44 @@ let orm = {
           }
           cb(result);
       });
-  },  
-}
+  },
+  insertOne: function(table, cols, vals, cb) {
+      let queryString = "INSERT INTO " + table;
+
+      queryString += " (";
+      queryString += cols.toString();
+      queryString += ") ";
+      queryString += "VALUES (";
+      queryString += printQuestionMarks(vals.length);
+      queryString += ") ";
+
+      console.log(queryString);
+
+      connection.query(queryString, vals, function(err, result) {
+          if (err) {
+              throw err;
+          }
+
+          cb(result);
+      });
+  },
+  updateOne: function(table, objColVals, condition, cb) {
+      let queryString = "UPDATE " + table;
+    
+      queryString += " SET ";
+      queryString += objToSql(objColVals);
+      queryString += " WHERE ";
+      queryString += condition;
+  
+      console.log(queryString);
+      connection.query(queryString, function(err, result) {
+        if (err) {
+          throw err;
+        }
+  
+        cb(result);
+      });
+  }  
+};
+
+module.exports = orm;
